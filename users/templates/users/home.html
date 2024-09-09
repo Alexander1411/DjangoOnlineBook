@@ -1,0 +1,90 @@
+{% extends 'users/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="display-4">Online Bookstore</h1>
+        </div>
+        <div class="col-md-6">
+            <form action="{% url 'search_books' %}" method="GET" class="d-flex">
+                <input type="text" name="q" class="form-control me-2" placeholder="Search books...">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Top Books Section -->
+    <section class="mb-5">
+        <h2 class="h3 mb-4">Top Books</h2>
+        <div id="topBooksCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for book_group in top_books %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <div class="row">
+                        {% for book in book_group %}
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                            <div class="card h-100 shadow-sm">
+                                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="card-img-top">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ book.title }}</h5>
+                                    <p class="card-text">{{ book.author }}</p>
+                                    <a href="{% url 'book_details' book.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#topBooksCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#topBooksCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Recommended Books Section -->
+    <section class="mb-5">
+        <h2 class="h3 mb-4">Recommended for You</h2>
+        <div id="recommendedBooksCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for book_group in recommended_books %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <div class="row">
+                        {% for book in book_group %}
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+                            <div class="card h-100 shadow-sm">
+                                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" class="card-img-top">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ book.title }}</h5>
+                                    <p class="card-text">{{ book.author }}</p>
+                                    <a href="{% url 'book_details' book.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#recommendedBooksCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#recommendedBooksCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </section>
+</div>
+{% endblock %}

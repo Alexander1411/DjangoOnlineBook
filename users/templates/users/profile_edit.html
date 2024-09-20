@@ -13,15 +13,13 @@
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         
+                        <!-- User Form Section (for first name, last name, email) -->
                         <div class="mb-4">
                             <h3 class="h5 text-muted mb-3">User Information</h3>
                             {% for field in user_form %}
                                 <div class="mb-3">
                                     <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                    {{ field }}
-                                    {% if field.help_text %}
-                                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                                    {% endif %}
+                                    {{ field }}  <!-- This will display the form field with the pre-filled value -->
                                     {% for error in field.errors %}
                                         <div class="invalid-feedback">{{ error }}</div>
                                     {% endfor %}
@@ -29,15 +27,13 @@
                             {% endfor %}
                         </div>
                         
+                        <!-- Profile Form Section (for phone number, city, birth date) -->
                         <div class="mb-4">
                             <h3 class="h5 text-muted mb-3">Profile Information</h3>
                             {% for field in profile_form %}
                                 <div class="mb-3">
                                     <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                    {{ field }}
-                                    {% if field.help_text %}
-                                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                                    {% endif %}
+                                    {{ field }}  <!-- This will display the form field with the pre-filled value -->
                                     {% for error in field.errors %}
                                         <div class="invalid-feedback">{{ error }}</div>
                                     {% endfor %}
@@ -45,10 +41,12 @@
                             {% endfor %}
                         </div>
                         
+                        <!-- Submit Button -->
                         <div class="text-end">
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form>
+                        
                 </div>
             </div>
         </div>

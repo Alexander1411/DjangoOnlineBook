@@ -5,6 +5,9 @@ from logging.handlers import RotatingFileHandler
 # Always first. On top.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SESSION_COOKIE_NAME = 'website_sessionid'  # This applies to normal user sessions
+SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db' # backend
+
 
 LOGGING = {
     'version': 1,
@@ -74,11 +77,13 @@ INSTALLED_APPS = [
     'books',
     'orders',
     'users.apps.UsersConfig',  # Instead of just users
+    #'rest_framework',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'onlinebooks.middleware.AdminSessionMiddleware',  # cookies
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -175,15 +180,21 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#EMAIL_HOST = 'smtp.gmail.com'
-#EMAIL_PORT = 587
-#EMAIL_USE_TLS = True
-#MAIL_HOST_USER = '22bubnov@gmail.com'
-#EMAIL_HOST_PASSWORD = 'alexander'
+# settings.py
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For testing
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '22bubnov@gmail.com' 
+EMAIL_HOST_PASSWORD = 'alexander'  
+DEFAULT_FROM_EMAIL = 'your-email@gmail.com'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For  testing
 
 
 STRIPE_PUBLIC_KEY = 'pk_test_51PwR3zQ74VVZ9ijxqV4Ecic3xB6HGGxcTu6fTupedTIaZEwKQfcqMOAIiUkQE03oT00cDrXY5Uc9QgnvRi5MS4JL00axL3T4gd' # https://dashboard.stripe.com/test/dashboard
 STRIPE_SECRET_KEY = 'sk_test_51PwR3zQ74VVZ9ijxjNfe9MIl5dgH2Uo6TPhbl5Ci6CPY7EIPXrfgWdXZJr068QPtTkoni93bQuT5trjcYtj04hUf00NOxrMfu9'
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51PwR3zQ74VVZ9ijxqV4Ecic3xB6HGGxcTu6fTupedTIaZEwKQfcqMOAIiUkQE03oT00cDrXY5Uc9QgnvRi5MS4JL00axL3T4gd'
+

@@ -18,6 +18,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('', include('users.urls')),  # Directs root URL to users.urls
     path('books/', include('books.urls')),  # Includes the books' URLs
+    path('orders/', include('orders.urls')), 
 
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

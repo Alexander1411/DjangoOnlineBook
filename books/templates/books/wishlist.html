@@ -17,7 +17,7 @@
 
                 <!-- Buttons Group for Remove and Add to Cart -->
                 <div>
-                    <a href="{% url 'remove_from_wishlist' item.book.id %}" class="btn btn-sm btn-danger">Remove</a>
+                    <a href="{% url 'remove_from_wishlist' item.book.id %}" class="btn btn-sm btn-danger">Remove</a> <!--linked to URL / path('wishlist/remove/<int:book_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),-->
                     <a href="{% url 'add_to_cart' item.book.id %}" class="btn btn-sm btn-success ms-2">
                         <i class="fas fa-shopping-cart"></i> Add to Cart
                     </a>
@@ -27,6 +27,8 @@
         </ul>
     </div>
 {% else %}
-    <p>Your wishlist is empty.</p>
+<div class="alert alert-info" role="alert">
+    Your wishlist is empty. <a href="{% url 'book_list' %}" class="alert-link">Continue shopping</a>
+</div>
 {% endif %}
 {% endblock %}

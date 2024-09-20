@@ -4,6 +4,24 @@
 {% block content %}
 <div class="container my-5">
     <h1 class="mb-4">All Books</h1>
+
+     <!-- Category Filter Form -->
+     <form method="GET" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <select name="category" class="form-select" aria-label="Filter by category">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+    </form>
+
     
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for book in books %}
@@ -19,6 +37,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ book.title }}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
+                    <h4 class="card-subtitle mb-2 text-muted">{{ book.category }}</h4>
                     <p class="card-text">{{ book.description|truncatewords:30 }}</p>
                 </div>
                 <ul class="list-group list-group-flush">

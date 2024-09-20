@@ -8,13 +8,13 @@ logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        # Only create a profile when the user is first created
+    if created: # Only create a profile when the user is first created
+
         Profile.objects.create(user=instance)
         logger.info(f"Profile created for user {instance.username}")
 
 @receiver(post_save, sender=User)
-def update_user_profile(sender, instance, **kwargs):
-    # This ensures that any changes to the User will also trigger a save on the Profile
+def update_user_profile(sender, instance, **kwargs): # that any changes to the User will also trigger a save on the Profile
+    
     instance.profile.save()
     logger.info(f"Profile updated for user {instance.username}")

@@ -1,19 +1,17 @@
 from django.urls import path
-from .views import BookDetailView, BookListView, BookUpdateView, BookDeleteView
+from .views import BookListView, BookDetailView
 from . import views
 
 urlpatterns = [
-    path('search/', views.search_books, name='search_books'),
-    path('<int:pk>/', BookDetailView.as_view(), name='book_details'),
-    path('', BookListView.as_view(), name='book_list'), 
+    path('search/', views.search_books, name='search_books'), #home search function 
+    path('<int:pk>/', BookDetailView.as_view(), name='book_details'), # home page
+    path('', BookListView.as_view(), name='book_list'), # all books 
     path('wishlist/', views.WishlistView.as_view(), name='wishlist_view'),
     path('wishlist/add/<int:book_id>/', views.add_to_wishlist, name='add_to_wishlist'),
     path('wishlist/remove/<int:book_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('cart/add/<int:book_id>/', views.add_to_cart, name='add_to_cart'),
 
-    # Add paths for book CRUD operations
-    path('<int:pk>/edit/', BookUpdateView.as_view(), name='book_edit'),
-    path('<int:pk>/delete/', BookDeleteView.as_view(), name='book_delete'),
+
 
     # cart view
     path('cart/', views.cart_view, name='cart_view'),

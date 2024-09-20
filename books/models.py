@@ -42,6 +42,9 @@ class Stock(models.Model):
     book = models.OneToOneField(Catalog, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
 
+    def __str__(self):
+        return f"{self.book.title} - {self.quantity} in stock"
+
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wishlists')
     book = models.ForeignKey(Catalog, on_delete=models.CASCADE, related_name='wishlist_items')

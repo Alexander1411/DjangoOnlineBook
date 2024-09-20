@@ -1,5 +1,4 @@
 {% load static %}
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,54 +12,53 @@
     <link rel="stylesheet" href="{% static 'users/style.css' %}">
     <style>
         body {
-            background-color: #FFF1F0;
+            background-color: #fff;
             font-family: Arial, sans-serif;
         }
         .container {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            max-width: 1200px;
-            margin-top: 50px;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 0;
         }
-        .left-side {
-            flex: 1;
-            padding-right: 50px;
-        }
-        .right-side {
-            flex: 1;
-            background-color: white;
+        .signup-form {
+            background-color: #fff;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
         }
         h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: bold;
             margin-bottom: 20px;
+            text-align: center;
         }
         .subtitle {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #666;
             margin-bottom: 30px;
+            text-align: center;
         }
         .form-control { 
             border-radius: 4px;
             border: 1px solid #ccc;
-            padding-right: 65px;
+            padding: 10px 15px;
         }
         .btn-primary {
-            background-color: #000;
-            border-color: #000;
+            background-color: #4285f4;
+            border-color: #4285f4;
             border-radius: 4px;
-            padding: 10px 20px;
+            padding: 12px 20px;
         }
         .btn-primary:hover {
-            background-color: #333;
-            border-color: #333;
+            background-color: #3367d6;
+            border-color: #3367d6;
         }
-        .btn-link { color: #6c757d; }
-        .btn-link:hover { color: #5a6268; }
+        .btn-link { color: #4285f4; }
+        .btn-link:hover { color: #3367d6; }
         .input-icon {
             position: absolute;
             right: 10px;
@@ -77,53 +75,58 @@
             width: 0;
             transition: width 0.3s ease-in-out;
         }
-        .form-group label { font-weight: bold; }
+        .form-group label { 
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
         .error-message { color: #dc3545; font-size: 0.875em; margin-top: 0.25rem; }
-        .toggle-option {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
+        .position-relative { position: relative; }
+        .btn-generate {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            border: none;
+            background: none;
+            color: #4285f4;
         }
-        .toggle-option button {
-            flex: 1;
-            background-color: #000;
-            border: 1px solid #000;
-            color: white;
-            padding: 10px;
-            cursor: pointer;
-        }
-        .toggle-option button.active {
-            background-color: #333;
+        .btn-generate:hover { color: #3367d6; }
+        @media (max-width: 768px) {
+            .signup-form {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="left-side">
+        <div class="signup-form">
             <h1>Opportunity is everywhere</h1>
             <p class="subtitle">Make the most of your time on the road on the platform with the largest network of active readers.</p>
-        </div>
-        <div class="right-side">
-            <h2 class="mb-4">Become a Book Reader</h2>
-            <div class="toggle-option">
-                <button class="active">I have a book</button>
-                <button>I need a book</button>
-            </div>
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ field|capfirst }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <form method="post" id="signupForm" novalidate>
                 {% csrf_token %}
                 
-                <div class="form-group">
-                    <label for="id_username">Username:</label>
-                    <div class="position-relative">
-                        <input type="text" class="form-control" id="id_username" name="username" required minlength="3" maxlength="30" pattern="^[a-zA-Z0-9_]+$" aria-describedby="usernameHelp">
-                        <button type="button" class="btn btn-link position-absolute" style="right: 0; top: 0; bottom: 0;" id="generateUsername" aria-label="Generate username">
-                            <i class="fas fa-magic" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                    <small id="usernameHelp" class="form-text text-muted">Username must be 3-30 characters long and can only contain letters, numbers, and underscores.</small>
-                    <div class="error-message" id="username-error"></div>
-                </div>
-
                 <div class="form-group">
                     <label for="id_first_name">First Name:</label>
                     <input type="text" class="form-control" id="id_first_name" name="first_name" required>
@@ -137,17 +140,10 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_email">Email Address:</label>
-                    <input type="email" class="form-control" id="id_email" name="email" required aria-describedby="emailHelp">
-                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-                    <div class="error-message" id="email-error"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_phone_number">Phone number:</label>
-                    <input type="tel" class="form-control" id="id_phone_number" name="phone_number" pattern="[0-9]{10}" required aria-describedby="phoneHelp">
-                    <small id="phoneHelp" class="form-text text-muted">Enter a 10-digit phone number without spaces or dashes.</small>
-                    <div class="error-message" id="phone-error"></div>
+                    <label for="id_birth_date">Birth date:</label>
+                    <input type="date" class="form-control" id="id_birth_date" name="birth_date" required>
+                    <small class="form-text text-muted">You must be at least 16 years old to register.</small>
+                    <div class="error-message" id="birth-date-error"></div>
                 </div>
 
                 <div class="form-group">
@@ -157,40 +153,49 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="id_invite_code">Invite code (optional):</label>
-                    <input type="text" class="form-control" id="id_invite_code" name="invite_code">
-                    <div class="error-message" id="invite-code-error"></div>
+                    <label for="id_username">Username:</label>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="id_username" name="username" required minlength="3" maxlength="30" pattern="^[a-zA-Z0-9_]+$" aria-describedby="usernameHelp">
+                        <button type="button" class="btn-generate" id="generateUsername" aria-label="Generate username">
+                            <i class="fas fa-magic" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <small id="usernameHelp" class="form-text text-muted">3-30 characters, letters, numbers, and underscores only.</small>
+                    <div class="error-message" id="username-error"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="id_birth_date">Birth date:</label>
-                    <div class="position-relative">
-                        <input type="text" class="form-control" id="id_birth_date" name="birth_date" required aria-describedby="birthDateHelp">
-                        <span class="input-icon">
-                            <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                        </span>
-                    </div>
-                    <div class="error-message" id="birth-date-error"></div>
+                    <label for="id_email">Email Address:</label>
+                    <input type="email" class="form-control" id="id_email" name="email" required aria-describedby="emailHelp">
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    <div class="error-message" id="email-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_phone_number">Phone Number:</label>
+                    <input type="tel" class="form-control" id="id_phone_number" name="phone_number" required pattern="^(08[3-9]\d{7})|(0[1-9]\d{8})$" aria-describedby="phoneHelp">
+                    <small id="phoneHelp" class="form-text text-muted">Enter a valid Irish phone number (e.g., 0891234567).</small>
+                    <div class="error-message" id="phone-error"></div>
                 </div>
 
                 <div class="form-group">
                     <label for="id_password1">Password:</label>
                     <div class="position-relative">
                         <input type="password" class="form-control" id="id_password1" name="password1" required minlength="8" aria-describedby="passwordHelp">
-                        <button type="button" class="btn btn-link position-absolute" style="right: 30px; top: 0; bottom: 0;" id="generatePassword" aria-label="Generate password">
+                        <button type="button" class="btn-generate" id="generatePassword" aria-label="Generate password">
                             <i class="fas fa-magic" aria-hidden="true"></i>
                         </button>
-                        <button type="button" class="btn btn-link position-absolute" style="right: 0; top: 0; bottom: 0;" id="togglePassword1" aria-label="Toggle password visibility">
+                        <button type="button" class="btn btn-link position-absolute" style="right: 30px; top: 0; bottom: 0;" id="togglePassword1" aria-label="Toggle password visibility">
                             <i class="fas fa-eye" aria-hidden="true"></i>
                         </button>
                     </div>
                     <div class="password-strength-meter"><div></div></div>
-                    <small id="passwordHelp" class="form-text text-muted">Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.</small>
+                    <small id="passwordHelp" class="form-text text-muted">At least 8 characters with uppercase, lowercase, numbers, and special characters.</small>
                     <div class="error-message" id="password1-error"></div>
                 </div>
-
+                
                 <div class="form-group">
-                    <label for="id_password2">Password confirmation:</label>
+                    <label for="id_password2">Confirm Password:</label>
                     <div class="position-relative">
                         <input type="password" class="form-control" id="id_password2" name="password2" required minlength="8">
                         <button type="button" class="btn btn-link position-absolute" style="right: 0; top: 0; bottom: 0;" id="togglePassword2" aria-label="Toggle password visibility">
@@ -203,15 +208,14 @@
                 <div class="form-group form-check">
                     <input type="checkbox" class="form-check-input" id="id_terms" name="terms" required>
                     <label class="form-check-label" for="id_terms">
-                        By proceeding, I agree to the <a href="#">Terms of Use</a> and acknowledge that I have read the <a href="#">Privacy Policy</a>.
+                        I agree to the <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>.
                     </label>
                     <div class="error-message" id="terms-error"></div>
                 </div>
-                {{ form.errors }}
 
                 <button type="submit" class="btn btn-primary btn-block">Sign up to read</button>
             </form>
-            <p class="mt-3 text-center">Already have an account? <a href="#">Log in</a></p>
+            <p class="mt-3 text-center">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
         </div>
     </div>
 
@@ -230,30 +234,7 @@
                     return randomUsername;
                 }
     
-              //  function checkUsernameUnique(username) {
-              //      return $.ajax({
-              //          url: '/check_username/',  // The endpoint to check if username exists
-              //          method: 'GET',
-              //          data: { username: username },
-              //          success: function (data) {
-              //              return data.is_unique; 
-              //          }
-              //      });
-             //   }
-    
-                function setUsername() {
-                    var username = generateUsername();
-                    checkUsernameUnique(username).done(function (isUnique) {
-                        if (isUnique) {
-                            $('#id_username').val(username).trigger('input');
-                        } else {
-                            // Try again if the username is not unique
-                            setUsername();
-                        }
-                    });
-                }
-    
-                setUsername();
+                $('#id_username').val(generateUsername()).trigger('input');
             });
     
             // Password visibility toggle
@@ -262,10 +243,10 @@
                 var toggleButton = $(buttonId);
                 if (passwordField.attr('type') === 'password') {
                     passwordField.attr('type', 'text');
-                    toggleButton.html('<i class="fas fa-eye-slash"></i>');
+                    toggleButton.find('i').removeClass('fa-eye').addClass('fa-eye-slash');
                 } else {
                     passwordField.attr('type', 'password');
-                    toggleButton.html('<i class="fas fa-eye"></i>');
+                    toggleButton.find('i').removeClass('fa-eye-slash').addClass('fa-eye');
                 }
             }
     
@@ -276,6 +257,27 @@
             $('#togglePassword2').click(function () {
                 togglePasswordVisibility('#id_password2', '#togglePassword2');
             });
+
+
+            // Irish phone number validation
+            function validateIrishPhoneNumber(phoneNumber) {
+                var regex = /^(08[3-9]\d{7})|(0[1-9]\d{8})$/;
+                return regex.test(phoneNumber);
+            }
+
+            $('#id_phone_number').on('input', function() {
+                var phoneNumber = $(this).val();
+                var errorElement = $('#phone-error');
+                if (validateIrishPhoneNumber(phoneNumber)) {
+                    $(this).removeClass('is-invalid');
+                    errorElement.text('');
+                } else {
+                    $(this).addClass('is-invalid');
+                    errorElement.text('Enter a valid Irish phone number.');
+            }
+        });
+
+
     
             // Password generation
             $('#generatePassword').click(function () {
@@ -322,34 +324,22 @@
                 checkPasswordStrength($(this).val());
             });
     
-            // Datepicker initialization
-            $('#id_birth_date').datepicker({
-                format: 'yyyy-mm-dd',
-                autoclose: true,
-                todayHighlight: true,
-                endDate: '-16y'
-            });
-    
-            // Consolidated form validation and submission
+            // Form validation and submission
             $('#signupForm').submit(function(event) {
                 event.preventDefault();
                 var form = $(this);
                 var isValid = true;
-    
-                // Date validation
-                var birthDate = $('#id_birth_date').val();
-                var datePattern = /^\d{2}-\d{2}-\d{4}$/;
-                if (!datePattern.test(birthDate)) {
+
+                // Check phone number
+                var phoneNumber = $('#id_phone_number').val();
+                if (!validateIrishPhoneNumber(phoneNumber)) {
                     isValid = false;
-                    $('#birth-date-error').text('Enter a valid date in DD-MM-YYYY format.');
-                    $('#id_birth_date').addClass('is-invalid');
-                } else {
-                    $('#birth-date-error').text('');
-                    $('#id_birth_date').removeClass('is-invalid');
+                    $('#id_phone_number').addClass('is-invalid');
+                    $('#phone-error').text('Enter a valid Irish phone number.');
                 }
     
                 // General form validation
-                form.find('input, select').each(function() {
+                form.find('input').each(function() {
                     var field = $(this);
                     var errorElement = $('#' + field.attr('id') + '-error');
                     if (!this.checkValidity()) {
@@ -376,13 +366,46 @@
                     form[0].submit();
                 }
             });
-    
-            // Toggle option functionality
-            $('.toggle-option button').click(function() {
-                $('.toggle-option button').removeClass('active');
-                $(this).addClass('active');
+
+            // Real-time validation
+            $('#signupForm input').on('input', function() {
+                var field = $(this);
+                var errorElement = $('#' + field.attr('id') + '-error');
+                if (this.checkValidity()) {
+                    field.removeClass('is-invalid');
+                    errorElement.text('');
+                } else {
+                    field.addClass('is-invalid');
+                    errorElement.text(this.validationMessage);
+                }
             });
-        });   
+
+            // Birthday validation
+            $('#id_birth_date').on('change', function() {
+                var birthDate = new Date($(this).val());
+                var today = new Date();
+                var age = today.getFullYear() - birthDate.getFullYear();
+                var m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                if (age < 16) {
+                    $(this).addClass('is-invalid');
+                    $('#birth-date-error').text('You must be at least 16 years old to register.');
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $('#birth-date-error').text('');
+                }
+            });
+
+
+            // Initialize datepicker for birth date
+            $('#id_birth_date').datepicker({
+                format: 'yyyy-mm-dd',
+                endDate: '-16y',
+                autoclose: true
+            });
+        });
     </script>
 </body>
 </html>

@@ -1,21 +1,49 @@
-<!-- book_details.html -->
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<h1>{{ book.title }}</h1>
-<p>{{ book.author }}</p>
-<p>{{ book.description }}</p>
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-4">
+            {% if book.cover_image %}
+                <img src="{{ book.cover_image.url }}" class="img-fluid" alt="{{ book.title }} cover">
+            {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                    <span class="text-muted">No cover available</span>
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-8">
+            <h1 class="mb-3">{{ book.title }}</h1>
+            <h4 class="text-muted mb-3">by {{ book.author }}</h4>
+            <h5 class="text-muted mb-3">Category: {{ book.category }}</h5>
+            
+            <p class="mb-4">{{ book.description }}</p>
+            
+            <ul class="list-group mb-4">
+                {% if book.stock %}
+                    <li class="list-group-item">Stock: {{ book.stock.quantity }} left</li>
+                {% else %}
+                    <li class="list-group-item text-danger">Out of stock</li>
+                {% endif %}
+                {% if book.price %}
+                    <li class="list-group-item">Price: €{{ book.price.amount }}</li>
+                {% else %}
+                    <li class="list-group-item text-muted">Price information unavailable</li>
+                {% endif %}
+            </ul>
 
-<!-- Wishlist button -->
-{% if user.is_authenticated %}
-    {% if in_wishlist %}
-        <a href="{% url 'remove_from_wishlist' book.id %}" class="btn btn-danger">Remove from Wishlist</a>
-    {% else %}
-        <a href="{% url 'add_to_wishlist' book.id %}" class="btn btn-primary">Add to Wishlist</a>
-    {% endif %}
-{% else %}
-    <p><a href="{% url 'login' %}">Log in</a> to add to wishlist.</p>
-{% endif %}
-
-
+            <!-- Wishlist button -->
+            {% if user.is_authenticated %}
+                {% if in_wishlist %}
+                    <a href="{% url 'remove_from_wishlist' book.id %}" class="btn btn-danger">Remove from Wishlist</a>
+                {% else %}
+                    <a href="{% url 'add_to_wishlist' book.id %}" class="btn btn-primary">Add to Wishlist</a>
+                {% endif %}
+            {% else %}
+                <p><a href="{% url 'login' %}">Log in</a> to add to wishlist.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,54 +1,118 @@
-{% extends 'users/base.html' %}
+{% extends "users/base.html" %}
 {% load static %}
 
 {% block content %}
 <div class="container my-5">
-    <h2 class="mb-4">Checkout</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Secure Checkout</h2>
+                </div>
+                <div class="card-body">
+                    <form id="payment-form" method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <h3 class="h5 text-muted mb-3">Payment Information</h3>
+                            <div class="mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                {{ form.email }}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="card-element" class="form-label">Card Information</label>
+                                <div id="card-element" class="form-control p-3"></div>
+                                <div id="card-errors" class="invalid-feedback"></div>
+                            </div>
 
-    <div class="card">
-        <ul class="list-group list-group-flush">
-            {% for field in form %}
-                <li class="list-group-item">
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="text-danger">{{ field.errors|first }}</div>
-                        {% endif %}
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+                            <div class="mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">Name on Card</label>
+                                {{ form.name }}
+                            </div>
 
-    <div class="mt-4 text-end">
-        <h4>Total: €{{ total_price }}</h4>
-        <form method="POST">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-primary btn-lg mt-2">Complete Order</button>
-        </form>
+                            <div class="mb-3">
+                                <label for="{{ form.country.id_for_label }}" class="form-label">Country or Region</label>
+                                {{ form.country }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3 class="h5 text-muted mb-3">Order Summary</h3>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Total:</span>
+                                <strong>€{{ total_price }}</strong>
+                            </div>
+                        </div>
+                        
+                        <div class="text-end">
+                            <button type="submit" id="submit-button" class="btn btn-primary">Pay €{{ total_price }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 {% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function(event) {
-            const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
-            let isValid = true;
-            requiredFields.forEach(field => {
-                if (!field.value.trim()) {
-                    isValid = false;
-                    field.classList.add('is-invalid');
-                } else {
-                    field.classList.remove('is-invalid');
-                }
-            });
-            if (!isValid) {
-                event.preventDefault();
-                alert('Please fill out all required fields.');
+    var stripe = Stripe('{{ stripe_pub_key }}');
+    var elements = stripe.elements();
+    
+    var style = {
+        base: {
+            fontSize: '16px',
+            color: '#32325d',
+        }
+    };
+    
+    var card = elements.create('card', {style: style});
+    card.mount('#card-element');
+
+    var form = document.getElementById('payment-form');
+    var submitButton = document.getElementById('submit-button');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        submitButton.disabled = true;
+        submitButton.textContent = 'Processing...';
+
+        stripe.createToken(card).then(function(result) {
+            if (result.error) {
+                var errorElement = document.getElementById('card-errors');
+                errorElement.textContent = result.error.message;
+                errorElement.style.display = 'block';
+                submitButton.disabled = false;
+                submitButton.textContent = 'Pay €{{ total_price }}';
+            } else {
+                var hiddenInput = document.createElement('input');
+                hiddenInput.setAttribute('type', 'hidden');
+                hiddenInput.setAttribute('name', 'stripeToken');
+                hiddenInput.setAttribute('value', result.token.id);
+                form.appendChild(hiddenInput);
+                form.submit();
             }
+        });
+    });
+
+    card.addEventListener('change', function(event) {
+        var displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+            displayError.style.display = 'block';
+        } else {
+            displayError.textContent = '';
+            displayError.style.display = 'none';
+        }
+    });
+
+    // Add Bootstrap classes to form fields
+    document.addEventListener('DOMContentLoaded', function() {
+        var formFields = document.querySelectorAll('input, select, textarea');
+        formFields.forEach(function(field) {
+            field.classList.add('form-control');
         });
     });
 </script>

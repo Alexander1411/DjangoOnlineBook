@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Catalog, Stock, Price, Category
+from .models import Catalog, Price, Category, Stock
 
 admin.site.register(Catalog)
 admin.site.register(Stock)

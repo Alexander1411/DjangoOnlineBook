@@ -35,14 +35,17 @@ class SignUpView(FormView): # SignUpForm connected to forms
     success_url = reverse_lazy('home') # reverse_lazy waits until the right moment to get the URL, preventing errors during startup : https://stackoverflow.com/questions/31275574/reverse-for-success-url-on-django-class-based-view-complain-about-circular-impor
 
     def form_valid(self, form): # if all the input data is correct (built-in methods)
-        user = form.save()
-        login(self.request, user)
-        messages.success(self.request, "Your account was created successfully")
-        return super().form_valid(form) # super() avoids repeating code, Django to handle valid/invalid forms
+            user = form.save()
+            login(self.request, user)
+            messages.success(self.request, "Your account was created successfully")
+            return super().form_valid(form) # super() avoids repeating code, Django to handle valid/invalid form
+            
 
     def form_invalid(self, form): # built-in methods provided by Django in the FormView class: automatically called
-        messages.error(self.request, "There was an error in your signup. Please try again.")
-        return super().form_invalid(form)
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f"{field.replace('_', ' ').capitalize()}: {error}") # testing this 
+            return super().form_invalid(form)
     
 # Custom validation for phone number and invite code, the phone number matches an international format using a regular expression
 def validate_phone_number(phone_number):
@@ -84,18 +87,19 @@ class ProfileView(LoginRequiredMixin, DetailView): # LoginRequiredMixin is a mix
 
 # Allows users to edit their profile information, handles updating both the User model and the Profile model.
 class EditProfileView(LoginRequiredMixin, UpdateView):
-    model = Profile
+    model = Profile  # We are editing the Profile model
     template_name = 'users/profile_edit.html'
-    form_class = ProfileForm
-    second_form_class = UserForm
+    form_class = ProfileForm  # This is for Profile model fields (phone number, city, birth date)
+    second_form_class = UserForm  # This is for User model fields (first name, last name, email)
 
     def get_object(self):
+        # Fetch the Profile object associated with the logged-in user
         return Profile.objects.get(user=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['user_form'] = self.second_form_class(instance=self.request.user)  
-        context['profile_form'] = self.form_class(instance=self.get_object())
+        context['user_form'] = self.second_form_class(instance=self.request.user)  # Pre-fill UserForm with current user data
+        context['profile_form'] = self.form_class(instance=self.get_object())  # Pre-fill ProfileForm with current profile data
         return context
 
     def post(self, request, *args, **kwargs):
@@ -103,14 +107,12 @@ class EditProfileView(LoginRequiredMixin, UpdateView):
         profile_form = self.form_class(request.POST, instance=self.get_object())
 
         if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
+            user_form.save()  # Save user data (first name, last name, email)
+            profile_form.save()  # Save profile data (phone number, city, birth date)
             messages.success(request, 'Profile updated successfully!')
             return redirect('view_profile')
         else:
-            # If the forms are invalid, re-render the page with the forms and their validation errors
             return self.render_to_response(self.get_context_data(user_form=user_form, profile_form=profile_form))
-
 
 class MyPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
     template_name = 'registration/password_change_form.html'

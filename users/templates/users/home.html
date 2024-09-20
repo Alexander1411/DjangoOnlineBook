@@ -8,7 +8,7 @@
             <h1 class="display-4">Online Bookstore</h1>
         </div>
         <div class="col-md-6">
-            <form action="{% url 'search_books' %}" method="GET" class="d-flex">
+            <form action="{% url 'search_books' %}" method="GET" class="d-flex"> <!--URL is in books app-->
                 <input type="text" name="q" class="form-control me-2" placeholder="Search books...">
                 <button class="btn btn-primary" type="submit">
                     <i class="fas fa-search"></i> Search

@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm # build in, handles creating a new user with a username and password
 from .models import Profile
+from django.core.exceptions import ValidationError
+import re
 import logging
 
 logger = logging.getLogger(__name__)
@@ -31,20 +33,33 @@ class SignUpForm(UserCreationForm): # main form used for new user registration, 
     def clean_email(self): # retrieves the submitted email and checks if it already exists in the User model. If it does, it raises a validation error; YotubeTutorial / https://www.youtube.com/watch?v=1_c9fbvxNmo&t=3s
         email = self.cleaned_data.get('email') # gets the email entered by the user from the form data
         if User.objects.filter(email=email).exists(): # if email exists raise error. directly querying the User model to check if an email already exists in the database
-            raise forms.ValidationError("Email already in use") 
+            raise forms.ValidationError("This email address is already in use") 
         return email
+    
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data.get('phone_number')
+        if Profile.objects.filter(phone_number=phone_number).exists():
+            raise ValidationError("This phone number is already in use.")
+        return phone_number
 
 # Form to update users basic information like first name, last name, and email, used when editing user details separately from the profile. in the User model.
-class UserForm(forms.ModelForm): #updating basic User Information!!!!!!!!!!
-    class Meta: 
-        model = User
-        fields = ['first_name', 'last_name', 'email']
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['phone_number', 'city', 'birth_date']
+
+    # Custom validation for the phone number field
+    #def clean_phone_number(self):
+    #    phone_number = self.cleaned_data.get('phone_number')
+    #    if not re.match(r'^(08[3-9]\d{7})|(0[1-9]\d{8})$', phone_number):
+    #        raise ValidationError("Enter a valid Irish phone number.")
+    #    return phone_number
 
 #  part of my Profile model, extends the User model to hold additional information
-class ProfileForm(forms.ModelForm):  # updating Profile Information!!!!!!!!!!!!!!!!!!!!!!!!!
+class UserForm(forms.ModelForm):  # updating Profile Information!!!!!!!!!!!!!!!!!!!!!!!!!
     class Meta:
-         model = Profile
-         fields = ['phone_number','city','birth_date']
+         model = User
+         fields = ['first_name', 'last_name', 'email']
 
 # Simple form to handle email notification preferences
 class EmailNotificationForm(forms.Form):
